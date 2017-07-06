@@ -17,7 +17,7 @@ jobs:
         trigger: true
       - get: ci
       - get: docker.opensuse-os-image
-      - get: semver.opensuse-stemcell
+      - get: semver.os-image-opensuse
       - put: status
         params:
           context: build
@@ -30,7 +30,6 @@ jobs:
           - DOCKER_REPOSITORY: ci-os-image-opensuse
       - put: docker.fissile-stemcell-opensuse
         inputs:
-          - name: semver.opensuse-stemcell-opensuse
           - name: versioned-fissile-stemcell
         params:
           build: versioned-fissile-stemcell-opensuse
@@ -60,14 +59,15 @@ resources:
       branch: master
       private_key: {{github-private-key}}
 
-  - name: semver.opensuse-stemcell
+  - name: semver.os-image-opensuse
     type: semver
     source:
-      driver: git
-      uri: git@github.com:SUSE/bosh-linux-stemcell-builder.git
-      branch: opensuse_stemcell_version
-      file: version
-      private_key: {{github-private-key}}
+      driver: s3
+      key: os-image-opensuse-leap-version
+      bucket: concourse-ci-bosh-stemcell
+      access_key_id: {{aws-access-key}}
+      secret_access_key: {{aws-secret-key}}
+      region_name: eu-central-1
 
   - name: docker.opensuse-os-image
     type: docker-image
