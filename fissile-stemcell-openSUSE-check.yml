@@ -26,8 +26,6 @@ jobs:
           state: pending
       - task: setup-opensuse-stemcell-versions
         file: ci/tasks/setup-opensuse-stemcell-versions.yml
-        input_mapping:
-          - src: src
         params:
           - DOCKER_REPOSITORY: ci-os-image-opensuse
       - put: docker.fissile-stemcell-opensuse
@@ -93,10 +91,10 @@ resources:
   - name: src
     type: pull-request
     source:
-        access_token: {{github-access-token}}
-        branch: "42.2"
-        private_key: {{github-private-key}}
-        uri: git@github.com:SUSE/fissile-stemcell-openSUSE.git
+      access_token: {{github-access-token}}
+      branch: "42.2"
+      private_key: {{github-private-key}}
+      uri: https://github.com/SUSE/fissile-stemcell-opensuse.git
 
   - name: status
     type: status
