@@ -11,9 +11,6 @@ inputs:
 - name: semver.opensuse-stemcell
 - name: src
 
-input_mapping: 
-- src: src
-
 outputs:
 - name: versioned-fissile-stemcell-opensuse
 

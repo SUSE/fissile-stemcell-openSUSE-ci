@@ -11,7 +11,7 @@ resource_types:
       tag: 0.0.13
 
 jobs:
-  - name: build-fissile-stemcell-opensuse-leap
+  - name: build
     plan:
       - put: status
         params:
@@ -27,6 +27,8 @@ jobs:
         - get: semver.opensuse-stemcell
       - task: setup-opensuse-stemcell-versions
         file: ci/tasks/setup-opensuse-stemcell-versions.yml
+        input_mapping:
+          - src: src
         params:
           - DOCKER_REPOSITORY: ci-os-image-opensuse
       - put: docker.fissile-stemcell-opensuse
@@ -93,9 +95,9 @@ resources:
     type: pull-request
     source:
         access_token: {{github-access-token}}
-        branch: master
+        branch: "42.2"
         private_key: {{github-private-key}}
-        uri: git@github.com:SUSE/fissile-stemcell-opensuse.git
+        uri: git@github.com:SUSE/fissile-stemcell-openSUSE.git
 
   - name: status
     type: status
