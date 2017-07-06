@@ -13,18 +13,17 @@ resource_types:
 jobs:
   - name: build
     plan:
+      - get: src
+        trigger: true
+      - get: ci
+      - get: docker.opensuse-os-image
+      - get: semver.opensuse-stemcell
       - put: status
         params:
-          context: fissile-stemcells/opensuse
+          context: build
           description: build opensuse fissile stemcell
           path: src
-          state: failure
-      - aggregate:
-        - get: ci
-        - get: src
-          trigger: true
-        - get: docker.opensuse-os-image
-        - get: semver.opensuse-stemcell
+          state: pending
       - task: setup-opensuse-stemcell-versions
         file: ci/tasks/setup-opensuse-stemcell-versions.yml
         input_mapping:
@@ -43,14 +42,14 @@ jobs:
     on_failure:
       put: status
       params:
-        context: fissile-stemcells/opensuse
+        context: build
         description: build opensuse fissile stemcell
         path: src
         state: failure
     on_success:
       put: status
       params:
-        context: fissile-stemcells/opensuse
+        context: build
         description: build opensuse fissile stemcell
         path: src
         state: success
