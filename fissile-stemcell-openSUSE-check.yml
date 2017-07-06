@@ -1,0 +1,104 @@
+---
+resource_types:
+  - name: pull-request
+    type: docker-image
+    source:
+      repository: splatform/concourse-github-pull-request
+  - name: status
+    type: docker-image
+    source:
+      repository: aduffeck/concourse-github-status
+      tag: 0.0.13
+
+jobs:
+  - name: build-fissile-stemcell-opensuse-leap
+    plan:
+      - put: status
+        params:
+          context: fissile-stemcells/opensuse
+          description: build opensuse fissile stemcell
+          path: src
+          state: failure
+      - aggregate:
+        - get: ci
+        - get: src
+          trigger: true
+        - get: docker.opensuse-os-image
+        - get: semver.opensuse-stemcell
+      - task: setup-opensuse-stemcell-versions
+        file: ci/tasks/setup-opensuse-stemcell-versions.yml
+        params:
+          - DOCKER_REPOSITORY: ci-os-image-opensuse
+      - put: docker.fissile-stemcell-opensuse
+        inputs:
+          - name: semver.opensuse-stemcell-opensuse
+          - name: versioned-fissile-stemcell
+        params:
+          build: versioned-fissile-stemcell-opensuse
+          tag: versioned-fissile-stemcell-opensuse/VERSION
+        get_params:
+          skip_download: true
+    on_failure:
+      put: status
+      params:
+        context: fissile-stemcells/opensuse
+        description: build opensuse fissile stemcell
+        path: src
+        state: failure
+    on_success:
+      put: status
+      params:
+        context: fissile-stemcells/opensuse
+        description: build opensuse fissile stemcell
+        path: src
+        state: success
+
+resources:
+  - name: ci
+    type: git
+    source:
+      uri: git@github.com:SUSE/fissile-stemcell-openSUSE-ci.git
+      branch: master
+      private_key: {{github-private-key}}
+
+  - name: semver.opensuse-stemcell
+    type: semver
+    source:
+      driver: git
+      uri: git@github.com:SUSE/bosh-linux-stemcell-builder.git
+      branch: opensuse_stemcell_version
+      file: version
+      private_key: {{github-private-key}}
+
+  - name: docker.opensuse-os-image
+    type: docker-image
+    source:
+      repository: splatform/ci-os-image-opensuse
+      tag: "latest"
+      username: {{docker-username}}
+      password: {{docker-password}}
+
+  - name: docker.fissile-stemcell-opensuse
+    type: docker-image
+    source:
+      repository: splatform/ci-fissile-stemcell-opensuse
+      tag: "42.2"
+      username: {{docker-username}}
+      password: {{docker-password}}
+
+  #
+  # check pr resources
+  #
+  - name: src
+    type: pull-request
+    source:
+        access_token: {{github-access-token}}
+        branch: master
+        private_key: {{github-private-key}}
+        uri: git@github.com:SUSE/fissile-stemcell-opensuse.git
+
+  - name: status
+    type: status
+    source:
+      access_token: {{github-access-token}}
+      repo: SUSE/fissile-stemcell-opensuse
