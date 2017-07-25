@@ -1,4 +1,4 @@
-TARGET ?= vancouver
+TARGET ?= skycastle
 CONCOURSE_URL ?= https://ci.from-the.cloud/
 GITHUB_ID ?= c29a4757ff0e43c25610
 GITHUB_TEAM ?= 'SUSE/Team Alfred'
