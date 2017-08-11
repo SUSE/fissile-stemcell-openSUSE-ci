@@ -14,7 +14,7 @@ login-sandbox:
 	fly -t sandbox login  --concourse-url http://192.168.100.4:8080/
 
 pipeline-check:
-	gpg --decrypt --batch --no-tty ${CONCOURSE_SECRETS_FILE} > ${TMP_SECRETS_FILE}
+	gpg --decrypt --batch --no-tty ${CONCOURSE_SECRETS_FILE} > ${TMP_SECRETS_FILE} 2> /dev/null
 	yes | fly -t ${TARGET} set-pipeline -c fissile-stemcell-openSUSE-check.yml -p fissile-stemcell-openSUSE-check -l ${TMP_SECRETS_FILE}
 	fly -t ${TARGET} unpause-pipeline -p fissile-stemcell-openSUSE-check
 	rm -f ${TMP_SECRETS_FILE}
