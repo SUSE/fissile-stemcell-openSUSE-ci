@@ -13,6 +13,7 @@ login-sandbox:
 	fly -t sandbox login  --concourse-url http://192.168.100.4:8080/
 
 pipeline-check: ${CONCOURSE_SECRETS_FILE}
-	# Explicitly call bash here to get process substitution
+	# Explicitly call bash here to get process substitution, otherwise make
+	# runs the shell in a mode that doesn't support <(...)
 	yes | bash -c "fly -t ${TARGET} set-pipeline -c fissile-stemcell-openSUSE-check.yml -p fissile-stemcell-openSUSE-check -l <(gpg --decrypt --batch --no-tty ${CONCOURSE_SECRETS_FILE})"
 	fly -t ${TARGET} unpause-pipeline -p fissile-stemcell-openSUSE-check
